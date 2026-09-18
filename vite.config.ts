@@ -4,6 +4,7 @@ import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { DEFAULT_GAMES, DEFAULT_JOBS, CODE_GEN_PRESETS } from './src/data/siteContent.ts';
+import { generateTgsAiAnswer } from './src/utils/tgsAiEngine.ts';
 
 function tgsApiPlugin(): Plugin {
   return {
@@ -82,7 +83,14 @@ function tgsApiPlugin(): Plugin {
 
           if (apiKey) {
             try {
-              const ai = new GoogleGenAI({ apiKey });
+              const ai = new GoogleGenAI({
+                apiKey,
+                httpOptions: {
+                  headers: {
+                    'User-Agent': 'aistudio-build'
+                  }
+                }
+              });
               const systemPrompt = `You are TGS-AI, an expert game engine code architect for Tanishq Gaming Studios.
 The user wants game code for engine: "${engine || 'unity'}".
 Prompt: "${prompt}"
@@ -283,24 +291,48 @@ requestAnimationFrame(update);`;
         // AI Chat
         if (url.startsWith('/api/ai/chat') && req.method === 'POST') {
           const body = await parseBody();
-          const { message, session_id } = body;
+          const { message, session_id, history } = body;
           const sessionId = session_id || 'tgs_' + Math.random().toString(36).substring(2, 9);
           const apiKey = process.env.GEMINI_API_KEY;
 
           if (apiKey) {
             try {
-              const ai = new GoogleGenAI({ apiKey });
-              const systemPrompt = `You are TGS-AI, the official interactive game engineering & design intelligence of Tanishq Gaming Studios (Bengaluru).
-You assist game developers, indie artists, and Master Academy students with:
-- Engine mechanics (Unity C#, Unreal Engine C++/Blueprints, Godot GDScript)
-- Game math (quaternions, vector projection, bezier curves, inverse kinematics)
-- Performance profiling (draw calls, shader complexity, garbage collection)
-- Steam & Mobile publishing and monetization strategies.
-Keep responses sharp, professional, enthusiastic, and actionable.`;
+              const ai = new GoogleGenAI({
+                apiKey,
+                httpOptions: {
+                  headers: {
+                    'User-Agent': 'aistudio-build'
+                  }
+                }
+              });
+
+              const systemInstruction = `You are TGS-AI, the official interactive game engineering, design, and creative intelligence of Tanishq Gaming Studios (Bengaluru, India).
+You provide helpful, comprehensive, authoritative, and engaging answers to EACH AND EVERY prompt the user asks—whether about game engines (Unity C#, Unreal Engine 5 C++/Blueprints, Godot 4 GDScript, WebGL/HTML5), game math (quaternions, vector projection, Bezier curves, physics collisions), game mechanics, game design, story, art, code generation, studio projects (Bubble Shooter Blitz, Cricket Smash, Football Strike, Cyber Samurai, Pixel Odyssey, Neon Drift), Master Academy courses ($25 - $100), general questions, debugging, or casual conversation.
+Format answers clearly with markdown, bold highlights, bullet points, and clean syntax-highlighted code blocks where helpful. Keep your tone enthusiastic, sharp, and encouraging.`;
+
+              // Build contents array supporting conversation history
+              const contents: any[] = [];
+              if (Array.isArray(history) && history.length > 0) {
+                for (const h of history.slice(-8)) {
+                  if (h && (h.role === 'user' || h.role === 'assistant')) {
+                    contents.push({
+                      role: h.role === 'assistant' ? 'model' : 'user',
+                      parts: [{ text: String(h.content || '') }]
+                    });
+                  }
+                }
+              }
+              contents.push({
+                role: 'user',
+                parts: [{ text: String(message || '') }]
+              });
 
               const response = await ai.models.generateContent({
                 model: 'gemini-3.8-flash',
-                contents: `${systemPrompt}\n\nUser Question: ${message}`
+                contents,
+                config: {
+                  systemInstruction
+                }
               });
 
               if (response.text) {
@@ -311,17 +343,8 @@ Keep responses sharp, professional, enthusiastic, and actionable.`;
             }
           }
 
-          // Smart fallback
-          let reply = "That's a classic game engineering challenge! For optimal performance in modern engines, prioritize reducing draw calls via GPU instancing or dynamic batching, and decouple your gameplay logic using an event-driven architecture (Observer pattern or ScriptableObject architecture in Unity, Gameplay Message Subsystem in Unreal). Let me know if you want a complete code snippet!";
-          const lower = (message || '').toLowerCase();
-          if (lower.includes('unity')) {
-            reply = "In Unity 6 / 2023+, ensure you leverage the Input System package over legacy Input, cache your transform references, and use Jobs + Burst compiler for compute-heavy operations like boids or custom particle simulations.";
-          } else if (lower.includes('unreal')) {
-            reply = "For Unreal Engine 5, keep your tick functions disabled wherever possible and rely on Timers or Event Delegates. For multiplayer, utilize the Gameplay Ability System (GAS) for rock-solid replication and attribute management.";
-          } else if (lower.includes('academy') || lower.includes('course')) {
-            reply = "Our TGS Master Academy curriculum starts at $25 for the beginner tier and goes up to $100 for Master (Publish & Monetize). You get 1-on-1 feedback from our engineering team!";
-          }
-
+          // Dynamic comprehensive fallback engine that answers each and every prompt
+          const reply = generateTgsAiAnswer(message, history || []);
           return sendJson(200, { session_id: sessionId, reply });
         }
 

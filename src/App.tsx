@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import axios from "axios";
 import {
   Gamepad2, Menu, X, ArrowUpRight, Play, Star, ChevronDown,
   Mail, MapPin, Twitter, Youtube, Twitch, Instagram, Github,
   Plus, Zap, GraduationCap, Check, ExternalLink,
-  Sparkles, Code2, Bot, Copy, Send, Film, Video, Loader2, ShoppingCart, Info, BookOpen
+  Sparkles, Code2, Bot, Copy, Send, Film, Video, Loader2, ShoppingCart, Info, BookOpen,
+  RotateCcw
 } from "lucide-react";
 import {
   TEAM, GAMEPLAYS, STORE, BLOG, PARTNERS, ACADEMY_URL, ACADEMY_COURSES,
@@ -14,6 +15,8 @@ import {
 } from "./data/siteContent";
 import { PlayableGamesModal } from "./components/PlayableGamesModal";
 import { GamesPreviewTab } from "./components/GamesPreviewTab";
+import { ChatMessageRenderer } from "./components/ChatMessageRenderer";
+import { generateTgsAiAnswer } from "./utils/tgsAiEngine";
 import { Toaster, toast } from "sonner";
 
 const API = "/api";
@@ -490,11 +493,72 @@ function AILab() {
 
   // Chat state
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi. I'm TGS-AI. Ask me anything — game design, Unity/Unreal debugging, math, monetization." }
+    { role: "assistant", content: "Hi. I'm TGS-AI, the engineering intelligence of Tanishq Gaming Studios. Ask me anything — game mechanics, engine debugging (Unity / Unreal / Godot), math, monetization, or TGS lore." }
   ]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const chatLogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatLogRef.current) {
+      chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
+    }
+  }, [messages, chatLoading]);
+
+  const sendChatMessage = async (textToSend: string) => {
+    const text = textToSend.trim();
+    if (!text || chatLoading) return;
+
+    const userMsg = { role: "user" as const, content: text };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const { data } = await axios.post(`${API}/ai/chat`, {
+        session_id: sessionId,
+        message: text,
+        history: updatedMessages
+      });
+      if (data?.session_id) setSessionId(data.session_id);
+      if (data?.reply) {
+        setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
+      } else {
+        const fallback = generateTgsAiAnswer(text, updatedMessages);
+        setMessages((m) => [...m, { role: "assistant", content: fallback }]);
+      }
+    } catch {
+      // Immediate fallback to local intelligence engine
+      const fallback = generateTgsAiAnswer(text, updatedMessages);
+      setMessages((m) => [...m, { role: "assistant", content: fallback }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const sendChat = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendChatMessage(chatInput);
+  };
+
+  const resetChat = () => {
+    setMessages([
+      { role: "assistant", content: "Chat history cleared. I'm TGS-AI — what game development challenge or question can I assist you with?" }
+    ]);
+    setSessionId(null);
+    toast.success("Chat reset");
+  };
+
+  const promptSuggestions = [
+    "Quaternions & Math",
+    "Optimize Unity Draw Calls",
+    "Unreal GAS Architecture",
+    "Hitstop & Game Juice",
+    "TGS Games Roster",
+    "Steam Wishlist Strategy"
+  ];
 
   const runCodeGen = async () => {
     if (!prompt.trim()) return;
@@ -508,26 +572,6 @@ function AILab() {
       toast.error("AI code-gen failed. Try again.");
     } finally {
       setCodeLoading(false);
-    }
-  };
-
-  const sendChat = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = chatInput.trim();
-    if (!text || chatLoading) return;
-
-    setMessages((m) => [...m, { role: "user", content: text }]);
-    setChatInput("");
-    setChatLoading(true);
-
-    try {
-      const { data } = await axios.post(`${API}/ai/chat`, { session_id: sessionId, message: text });
-      if (data.session_id) setSessionId(data.session_id);
-      setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
-    } catch {
-      setMessages((m) => [...m, { role: "assistant", content: "Something went wrong. Please try again." }]);
-    } finally {
-      setChatLoading(false);
     }
   };
 
@@ -648,48 +692,88 @@ function AILab() {
           </div>
 
           {/* Chat Assistant */}
-          <div className="lg:col-span-5 tgs-card p-6 md:p-8 flex flex-col">
-            <div className="flex items-center gap-2 mb-1">
-              <Bot className="w-4 h-4 text-[var(--tgs-green)]" />
-              <span className="eyebrow" style={{ color: "var(--tgs-green)" }}>TGS-AI Chat</span>
-            </div>
-            <h3 className="font-display font-bold uppercase text-2xl mt-1 text-white">Ask. Solve. Ship.</h3>
-
-            <div
-              data-testid="ai-chat-log"
-              className="mt-5 bg-black border border-white/10 p-4 h-[380px] overflow-y-auto space-y-4"
-            >
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  data-testid={`ai-chat-msg-${m.role}`}
-                  className={`text-sm ${m.role === "user" ? "text-white" : "text-white/80"}`}
-                >
-                  <div className={`text-[10px] uppercase tracking-widest font-display mb-1 ${m.role === "user" ? "text-[var(--tgs-red)]" : "text-[var(--tgs-green)]"}`}>
-                    {m.role === "user" ? "You" : "TGS-AI"}
+          <div className="lg:col-span-5 tgs-card p-6 md:p-8 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Bot className="w-4 h-4 text-[var(--tgs-green)]" />
+                    <span className="eyebrow" style={{ color: "var(--tgs-green)" }}>TGS-AI Chat</span>
                   </div>
-                  <div className="whitespace-pre-wrap leading-relaxed">{m.content}</div>
+                  <h3 className="font-display font-bold uppercase text-2xl mt-1 text-white">Ask. Solve. Ship.</h3>
                 </div>
-              ))}
-              {chatLoading && (
-                <div className="text-xs text-white/40 flex items-center gap-2">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Thinking…
+                <button
+                  type="button"
+                  onClick={resetChat}
+                  title="Reset conversation"
+                  className="flex items-center gap-1.5 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-2.5 py-1.5 rounded transition cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
+              </div>
+
+              <div
+                ref={chatLogRef}
+                data-testid="ai-chat-log"
+                className="mt-5 bg-black/90 border border-white/10 p-4 h-[380px] overflow-y-auto space-y-4 rounded-sm"
+              >
+                {messages.map((m, i) => (
+                  <div
+                    key={i}
+                    data-testid={`ai-chat-msg-${m.role}`}
+                    className={`text-sm ${m.role === "user" ? "text-white" : "text-white/85"}`}
+                  >
+                    <div className={`text-[10px] uppercase tracking-widest font-display mb-1 flex items-center justify-between ${m.role === "user" ? "text-[var(--tgs-red)]" : "text-[var(--tgs-green)]"}`}>
+                      <span>{m.role === "user" ? "You" : "TGS-AI"}</span>
+                      <span className="text-[9px] text-white/30 font-mono">
+                        {m.role === "assistant" ? "interactive engine" : "dev"}
+                      </span>
+                    </div>
+                    <div className="leading-relaxed">
+                      <ChatMessageRenderer content={m.content} />
+                    </div>
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="text-xs text-emerald-400 flex items-center gap-2 bg-emerald-950/20 border border-emerald-500/20 p-2.5 rounded">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+                    <span>Synthesizing game engineering analysis…</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Prompt Suggestions */}
+              <div className="mt-3">
+                <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1.5 font-display">Suggested Prompts:</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {promptSuggestions.map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => sendChatMessage(s)}
+                      disabled={chatLoading}
+                      className="text-[11px] px-2.5 py-1 rounded bg-white/5 hover:bg-white/15 border border-white/10 hover:border-[var(--tgs-green)] text-white/70 hover:text-white transition cursor-pointer disabled:opacity-50"
+                    >
+                      {s}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
 
             <form onSubmit={sendChat} className="mt-4 flex gap-2" data-testid="ai-chat-form">
               <input
                 data-testid="ai-chat-input"
                 className="input-sharp flex-1"
-                placeholder="Ask about Unity, physics, monetization…"
+                placeholder="Ask about Unity, Unreal, math, publishing, lore…"
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
               />
               <button
                 data-testid="ai-chat-send"
                 type="submit"
-                disabled={chatLoading}
+                disabled={chatLoading || !chatInput.trim()}
                 className="btn-primary disabled:opacity-50 px-5"
                 aria-label="Send message"
               >
