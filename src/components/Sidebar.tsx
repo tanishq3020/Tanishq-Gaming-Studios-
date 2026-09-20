@@ -15,10 +15,16 @@ import {
   ChevronRight,
   Code2,
   Flame,
-  User as UserIcon
+  User as UserIcon,
+  Instagram,
+  Youtube,
+  Linkedin,
+  Facebook,
+  Mail
 } from "lucide-react";
 import { Conversation, User } from "../types/chat";
 import { TgsLogo } from "./TgsLogo";
+import { SOCIAL_LINKS } from "../data/siteContent";
 
 interface Props {
   isOpen: boolean;
@@ -36,6 +42,7 @@ interface Props {
   onOpenAuth: () => void;
   onToggleLandingPage: () => void;
   onGoToStudio?: () => void;
+  onOpenContact?: () => void;
   currentUser: User | null;
 }
 
@@ -55,6 +62,7 @@ export const Sidebar: React.FC<Props> = ({
   onOpenAuth,
   onToggleLandingPage,
   onGoToStudio,
+  onOpenContact,
   currentUser
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -308,8 +316,19 @@ export const Sidebar: React.FC<Props> = ({
               title="View Landing Page"
             >
               <Globe className="w-3.5 h-3.5 text-[var(--tgs-blue)]" />
-              <span>Landing Page</span>
+              <span>Landing</span>
             </button>
+            {onOpenContact && (
+              <button
+                type="button"
+                onClick={onOpenContact}
+                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition text-xs border border-white/10"
+                title="Contact & Social Channels"
+              >
+                <Mail className="w-3.5 h-3.5 text-[var(--tgs-red)]" />
+                <span>Contact</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onOpenSettings}
@@ -326,6 +345,53 @@ export const Sidebar: React.FC<Props> = ({
             >
               <Trash2 className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Social Links Row */}
+          <div className="flex items-center justify-between px-1 pt-1 pb-0.5 text-white/50 text-xs">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-white/40">Connect</span>
+            <div className="flex items-center gap-1.5">
+              <a
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram: @tanishq_3_0_1"
+                title="Instagram: @tanishq_3_0_1"
+                className="p-1.5 rounded-md hover:bg-pink-500/20 text-white/50 hover:text-pink-400 transition"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube: Tanishq Gaming Studios"
+                title="YouTube: Tanishq Gaming Studios"
+                className="p-1.5 rounded-md hover:bg-red-600/20 text-white/50 hover:text-red-400 transition"
+              >
+                <Youtube className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn: Tanishq Gaming Studios"
+                title="LinkedIn: Tanishq Gaming Studios"
+                className="p-1.5 rounded-md hover:bg-sky-600/20 text-white/50 hover:text-sky-400 transition"
+              >
+                <Linkedin className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook: Tanishq Gaming Studios"
+                title="Facebook: Tanishq Gaming Studios"
+                className="p-1.5 rounded-md hover:bg-blue-600/20 text-white/50 hover:text-blue-400 transition"
+              >
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+            </div>
           </div>
 
           {/* User Account Tile */}

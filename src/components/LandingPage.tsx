@@ -12,17 +12,24 @@ import {
   Cpu,
   Layers,
   Send,
-  MessageSquare
+  MessageSquare,
+  Instagram,
+  Youtube,
+  Linkedin,
+  Facebook,
+  Mail
 } from "lucide-react";
 import { TgsLogo } from "./TgsLogo";
+import { SOCIAL_LINKS, CONTACT_INFO } from "../data/siteContent";
 
 interface Props {
   onStartChatting: () => void;
   onOpenGameDev: () => void;
   onGoToStudio: () => void;
+  onOpenContact?: () => void;
 }
 
-export const LandingPage: React.FC<Props> = ({ onStartChatting, onOpenGameDev, onGoToStudio }) => {
+export const LandingPage: React.FC<Props> = ({ onStartChatting, onOpenGameDev, onGoToStudio, onOpenContact }) => {
   const [demoPrompt, setDemoPrompt] = useState("How does TGS AI optimize Unity draw calls?");
   const [demoAnswer, setDemoAnswer] = useState<string | null>(
     "TGS AI implements dynamic occlusion culling, GPU instancing batches, texture atlasing, and LOD groups—reducing draw calls by up to 74% in mobile and PC titles."
@@ -73,7 +80,18 @@ export const LandingPage: React.FC<Props> = ({ onStartChatting, onOpenGameDev, o
       <header className="h-20 px-4 sm:px-8 border-b border-white/10 bg-[#060913]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-40">
         <TgsLogo size="md" showTagline={true} />
 
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {onOpenContact && (
+            <button
+              type="button"
+              onClick={onOpenContact}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 text-xs font-semibold border border-white/10 transition cursor-pointer"
+            >
+              <Mail className="w-3.5 h-3.5 text-[var(--tgs-red)]" />
+              <span className="hidden sm:inline">Contact</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onGoToStudio}
@@ -243,24 +261,76 @@ export const LandingPage: React.FC<Props> = ({ onStartChatting, onOpenGameDev, o
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer with Social Links */}
       <footer className="mt-auto border-t border-white/10 bg-[#050811] py-8 px-4 sm:px-8 text-center text-xs text-white/50">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <TgsLogo size="sm" showTagline={true} />
 
-          <div className="flex items-center gap-6 text-xs text-white/60">
-            <button type="button" onClick={onStartChatting} className="hover:text-white">
+          {/* Social Links Row */}
+          <div className="flex items-center gap-2.5">
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              title="Instagram: @tanishq_3_0_1"
+              className="w-8 h-8 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 hover:text-white transition"
+            >
+              <Instagram className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              title="YouTube: Tanishq Gaming Studios"
+              className="w-8 h-8 rounded-lg bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500 hover:text-white transition"
+            >
+              <Youtube className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              title="LinkedIn: Tanishq Gaming Studios"
+              className="w-8 h-8 rounded-lg bg-sky-600/10 hover:bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-400 hover:text-white transition"
+            >
+              <Linkedin className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href={SOCIAL_LINKS.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              title="Facebook: Tanishq Gaming Studios"
+              className="w-8 h-8 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 hover:text-white transition"
+            >
+              <Facebook className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="flex items-center gap-5 text-xs text-white/60">
+            <button type="button" onClick={onStartChatting} className="hover:text-white cursor-pointer">
               Chat
             </button>
-            <button type="button" onClick={onOpenGameDev} className="hover:text-white">
+            <button type="button" onClick={onOpenGameDev} className="hover:text-white cursor-pointer">
               Game Dev
             </button>
+            <button type="button" onClick={onGoToStudio} className="hover:text-white cursor-pointer">
+              Studio
+            </button>
+            {onOpenContact && (
+              <button type="button" onClick={onOpenContact} className="text-[var(--tgs-red-bright)] hover:underline cursor-pointer font-bold">
+                Contact
+              </button>
+            )}
             <span className="text-white/30">•</span>
             <span>Bengaluru, India</span>
           </div>
 
           <div className="text-[11px] text-white/40">
-            © 2026 Tanishq Gaming Studios. All rights reserved.
+            © 2026 Tanishq Gaming Studios.
           </div>
         </div>
       </footer>

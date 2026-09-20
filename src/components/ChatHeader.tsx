@@ -8,7 +8,8 @@ import {
   Settings,
   Trash2,
   Globe,
-  Cpu
+  Cpu,
+  Mail
 } from "lucide-react";
 import { AiMode, AiModelId } from "../types/chat";
 import { TgsLogo } from "./TgsLogo";
@@ -24,6 +25,7 @@ interface Props {
   onClearConversation: () => void;
   onToggleLandingPage: () => void;
   onGoToStudio: () => void;
+  onOpenContact?: () => void;
   hasMessages: boolean;
 }
 
@@ -38,6 +40,7 @@ export const ChatHeader: React.FC<Props> = ({
   onClearConversation,
   onToggleLandingPage,
   onGoToStudio,
+  onOpenContact,
   hasMessages
 }) => {
   const modes: Array<{ id: AiMode; label: string; desc: string; icon: React.ReactNode }> = [
@@ -158,6 +161,18 @@ export const ChatHeader: React.FC<Props> = ({
             title="Clear current messages"
           >
             <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Contact & Social Channels */}
+        {onOpenContact && (
+          <button
+            type="button"
+            onClick={onOpenContact}
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition cursor-pointer"
+            title="Official Contact & Social Channels"
+          >
+            <Mail className="w-4 h-4 text-[var(--tgs-red-bright)]" />
           </button>
         )}
 

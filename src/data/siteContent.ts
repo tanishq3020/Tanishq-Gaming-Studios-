@@ -383,3 +383,21 @@ export const DEFAULT_JOBS: JobItem[] = [
     description: "Optimize memory budgets, frame times, and thermal throttle headroom for Velocity Drift across low-end to flagship mobile hardware."
   }
 ];
+
+export const SOCIAL_LINKS = {
+  instagram: "https://instagram.com/tanishq_3_0_1?igsh=MWNneTc5OXltOHd1cQ==",
+  youtube: "https://youtube.com/@tanishqgamingstudios",
+  linkedin: "https://linkedin.com/in/tanishq-gaming-studios",
+  facebook: "https://facebook.com/tanishqgamingstudios",
+  email: "walunjtanishq447@gmail.com",
+  location: "Bengaluru, Karnataka, India",
+  phone: "+91 98765 43210"
+};
+
+export const CONTACT_INFO = {
+  email: "walunjtanishq447@gmail.com",
+  studioEmail: "contact@tgs.games",
+  location: "Bengaluru, Karnataka, India",
+  studioName: "Tanishq Gaming Studios",
+  businessHours: "Mon - Sat: 10:00 AM - 8:00 PM IST"
+};

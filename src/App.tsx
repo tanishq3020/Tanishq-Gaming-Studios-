@@ -21,6 +21,7 @@ import { SettingsModal } from "./components/SettingsModal";
 import { AuthModal } from "./components/AuthModal";
 import { LandingPage } from "./components/LandingPage";
 import { TanishqGamingStudiosPortal } from "./components/TanishqGamingStudiosPortal";
+import { ContactModal } from "./components/ContactModal";
 
 const STORAGE_KEY_CONVERSATIONS = "tgs_ai_conversations_v2";
 const STORAGE_KEY_PREFS = "tgs_ai_preferences_v2";
@@ -91,6 +92,7 @@ export function App() {
   const [isGameDevModalOpen, setIsGameDevModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   // Streaming & Generation State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -614,6 +616,11 @@ export function App() {
             setIsGameDevModalOpen(true);
           }}
           onGoToStudio={() => setView("studio")}
+          onOpenContact={() => setIsContactModalOpen(true)}
+        />
+        <ContactModal
+          isOpen={isContactModalOpen}
+          onClose={() => setIsContactModalOpen(false)}
         />
         <GameDevAssistantModal
           isOpen={isGameDevModalOpen}
@@ -652,6 +659,7 @@ export function App() {
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onToggleLandingPage={() => setView("landing")}
         onGoToStudio={() => setView("studio")}
+        onOpenContact={() => setIsContactModalOpen(true)}
         currentUser={currentUser}
       />
 
@@ -678,6 +686,7 @@ export function App() {
           onClearConversation={handleClearActiveConversation}
           onToggleLandingPage={() => setView("landing")}
           onGoToStudio={() => setView("studio")}
+          onOpenContact={() => setIsContactModalOpen(true)}
           hasMessages={hasMessages}
         />
 
@@ -748,6 +757,12 @@ export function App() {
         onRegister={handleRegister}
         onLogout={handleLogout}
         onUpdateProfile={handleUpdateProfile}
+      />
+
+      {/* Contact & Socials Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
     </div>
   );
