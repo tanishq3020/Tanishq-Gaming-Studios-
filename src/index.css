@@ -3,15 +3,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Unbounded:wght@400;600;700;800;900&display=swap');
 
 :root {
-  --tgs-bg: #0a0a0a;
-  --tgs-surface: #121212;
-  --tgs-surface-2: #1a1a1a;
-  --tgs-red: #E53935;
-  --tgs-red-bright: #ff3b3b;
+  --tgs-bg: #060913;
+  --tgs-navy: #0b1222;
+  --tgs-navy-light: #111b33;
+  --tgs-surface: #0c1427;
+  --tgs-surface-2: #141e38;
+  --tgs-blue: #00d2ff;
+  --tgs-blue-electric: #38bdf8;
+  --tgs-blue-glow: rgba(0, 210, 255, 0.35);
+  --tgs-red: #ff3344;
+  --tgs-red-bright: #ff4757;
+  --tgs-red-glow: rgba(255, 51, 68, 0.35);
   --tgs-green: #39FF14;
   --tgs-text: #FFFFFF;
-  --tgs-text-2: #A1A1AA;
-  --tgs-border: #27272A;
+  --tgs-text-2: #94A3B8;
+  --tgs-border: rgba(255, 255, 255, 0.1);
+  --tgs-border-glow: rgba(0, 210, 255, 0.3);
+}
+
+[data-theme="navy"] {
+  --tgs-bg: #040817;
+  --tgs-surface: #0a1128;
+  --tgs-surface-2: #101c42;
+  --tgs-border: rgba(56, 189, 248, 0.15);
+}
+
+[data-theme="cyber"] {
+  --tgs-bg: #02040a;
+  --tgs-surface: #080d1a;
+  --tgs-surface-2: #0f1830;
+  --tgs-blue: #00f0ff;
+  --tgs-red: #ff0055;
+  --tgs-border: rgba(0, 240, 255, 0.25);
+}
+
+[data-theme="light"] {
+  --tgs-bg: #f8fafc;
+  --tgs-surface: #ffffff;
+  --tgs-surface-2: #f1f5f9;
+  --tgs-navy: #e2e8f0;
+  --tgs-text: #0f172a;
+  --tgs-text-2: #64748b;
+  --tgs-border: rgba(15, 23, 42, 0.12);
+  --tgs-blue: #0284c7;
+  --tgs-red: #dc2626;
 }
 
 * {
@@ -25,13 +60,46 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
   margin: 0;
   overflow-x: hidden;
+  height: 100%;
 }
 
 body {
   background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(229,57,53,0.10), transparent 60%),
-    radial-gradient(900px 500px at 0% 20%, rgba(57,255,20,0.05), transparent 60%),
+    radial-gradient(1200px 700px at 85% -10%, rgba(0, 210, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 5% 30%, rgba(255, 51, 68, 0.07), transparent 60%),
+    radial-gradient(800px 800px at 50% 100%, rgba(11, 18, 34, 0.9), transparent 80%),
     var(--tgs-bg);
+}
+
+/* Glassmorphism panel */
+.glass-panel {
+  background: rgba(11, 18, 34, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-input {
+  background: rgba(6, 10, 20, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glow-blue {
+  box-shadow: 0 0 24px rgba(0, 210, 255, 0.28);
+}
+
+.glow-red {
+  box-shadow: 0 0 24px rgba(255, 51, 68, 0.28);
+}
+
+.text-glow-blue {
+  text-shadow: 0 0 12px rgba(0, 210, 255, 0.6);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 12px rgba(255, 51, 68, 0.6);
 }
 
 .font-display { font-family: 'Unbounded', sans-serif; letter-spacing: -0.02em; }

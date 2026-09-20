@@ -1,6 +1,6 @@
 {
-  "name": "Tanishq Gaming Studios",
-  "description": "Official website for Tanishq Gaming Studios (TGS) featuring games portfolio, AI game dev lab, live gameplays, gaming store, master academy, and studio showcase.",
-  "requestFramePermissions": [],
+  "name": "TGS AI Chat",
+  "description": "Create. Code. Game. Imagine. Modern AI chatbot web app by Tanishq Gaming Studios for gaming, coding, and creative intelligence.",
+  "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

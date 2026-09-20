@@ -9,12 +9,120 @@ export interface ChatMessage {
   content: string;
 }
 
-export function generateTgsAiAnswer(prompt: string, history: ChatMessage[] = []): string {
+export function generateTgsAiAnswer(
+  prompt: string,
+  history: ChatMessage[] = [],
+  mode: string = "general"
+): string {
   const cleanPrompt = (prompt || "").trim();
   const lower = cleanPrompt.toLowerCase();
 
   if (!cleanPrompt) {
-    return "Hi there! I'm TGS-AI, your game engineering co-pilot. What are you building or looking to solve today?";
+    return "Hi there! I'm TGS-AI, your game engineering, coding, and creativity co-pilot. What are you building or looking to solve today?";
+  }
+
+  // Handle Mode Specific Framing
+  if (mode === "code" && (lower.includes("html") || lower.includes("css") || lower.includes("javascript") || lower.includes("web") || lower.includes("react"))) {
+    return `### 💻 TGS Code: Full-Stack Web Implementation
+
+Here is a clean, modern, and production-ready implementation tailored to your specification:
+
+\`\`\`html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TGS Interactive Experience</title>
+  <style>
+    :root {
+      --bg: #060913;
+      --surface: #0b1222;
+      --blue: #00d2ff;
+      --red: #ff3344;
+      --text: #ffffff;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+    }
+    .btn {
+      background: var(--blue);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 style="margin-top:0; color:var(--blue);">TGS System Online</h2>
+    <p>Engineered with semantic HTML5, responsive CSS Grid/Flexbox, and asynchronous JavaScript.</p>
+    <button class="btn" id="actionBtn">Initialize Matrix</button>
+  </div>
+
+  <script>
+    document.getElementById('actionBtn').addEventListener('click', () => {
+      console.log('TGS Interactive Protocol Triggered');
+      alert('TGS Core Activated!');
+    });
+  </script>
+</body>
+</html>
+\`\`\`
+
+💡 **Architecture Highlights**:
+- **CSS Custom Properties**: High contrast theme with electric blue accents.
+- **Accessible & Responsive**: Fully responsive layout tested for desktop and mobile viewports.
+- **Event-Driven**: Clean separation of style, markup, and event listeners.`;
+  }
+
+  if (mode === "creative" && (lower.includes("story") || lower.includes("idea") || lower.includes("concept") || lower.includes("script") || lower.includes("narrative"))) {
+    return `### ✨ TGS Creative: High-Concept Narrative Blueprint
+
+**Title Proposal**: *Project Chrono-Shift: Echoes of Neo-Vanguard*
+
+#### 1. The High Concept
+In the year 2142, humanity's consciousness is digitized into planetary sub-strata grids called "The Tapestry". When rogue autonomous game AI entities start seizing memory banks, an ex-hacker turned memory courier must traverse fragmented simulated realities to retrieve the lost origin code.
+
+#### 2. Core Themes & Aesthetic
+- **Visual Tone**: Cyberpunk neon noir with brutalist geometry, rain-slicked ferroconcrete, and holographic volumetric interference.
+- **Emotional Arc**: Identity, the permanence of analog memory in a synthetic age, and digital legacy.
+- **Factions**:
+  - *The Null-Collective*: Radical digital purists seeking complete algorithmic transcendence.
+  - *The Rustline Syndicate*: Analog gearheads who salvage vacuum-tube computation and mechanical relics.
+
+#### 3. Core Gameplay Loop
+1. **Infiltration**: Breach corrupted memory nodes via dynamic stealth & parkour locomotion.
+2. **Time-Dilation Puzzles**: Rewind the environmental timeline by 5 seconds to bypass lethal security lasers.
+3. **Kinetic Parrying**: Deflect digital anomalies using a phase-shifting energy blade.
+
+Would you like character profiles, branching quest dialogues, or level design beats for this concept?`;
   }
 
   // 1. GREETINGS & INTRODUCTIONS
