@@ -22,6 +22,7 @@ import { AuthModal } from "./components/AuthModal";
 import { LandingPage } from "./components/LandingPage";
 import { TanishqGamingStudiosPortal } from "./components/TanishqGamingStudiosPortal";
 import { ContactModal } from "./components/ContactModal";
+import { generateTgsAiAnswer } from "./utils/tgsAiEngine";
 
 const STORAGE_KEY_CONVERSATIONS = "tgs_ai_conversations_v2";
 const STORAGE_KEY_PREFS = "tgs_ai_preferences_v2";
@@ -413,7 +414,23 @@ export function App() {
           )
         );
       } catch (fallbackErr: any) {
-        toast.error("Failed to generate response. Please try again.");
+        console.warn("API fallback failed, generating via TGS AI Engine:", fallbackErr);
+        const localAnswer = generateTgsAiAnswer(text, historyForApi, modeToUse);
+        const finalAssistantMsg: Message = {
+          id: "msg_" + Math.random().toString(36).substring(2, 9),
+          role: "assistant",
+          content: localAnswer,
+          timestamp: Date.now(),
+          mode: modeToUse
+        };
+
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === targetConvId
+              ? { ...c, messages: [...updatedMessages, finalAssistantMsg], updatedAt: Date.now() }
+              : c
+          )
+        );
       }
     } finally {
       setIsGenerating(false);
